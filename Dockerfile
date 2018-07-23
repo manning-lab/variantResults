@@ -1,5 +1,7 @@
 FROM r-base:3.5.0
 
+RUN apt-get update && apt-get install -y git
+
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
 
 RUN echo "install.packages(c('data.table','dplyr','tidyr'), repos='http://cran.us.r-project.org')" > install.R && \

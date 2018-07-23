@@ -3,14 +3,13 @@ task burdenCarriers {
 	File assoc_file
 	File group_file
 	String out_pref
-	String pval
 	Float? pval_thresh
 
 	Int disk
 	Int memory
 	
 	command {
-		R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${pval} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
+		R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
 	}
 
 	runtime {
@@ -20,8 +19,8 @@ task burdenCarriers {
 	}
 
 	output {
-		File carriers = glob("${out_pref}.*.carriers.csv")
-		File genotypes = glob("${out_pref}.*.genotypes.csv")
+		Array[File] carriers = glob("${out_pref}.*.carriers.csv")
+		Array[File] genotypes = glob("${out_pref}.*.genotypes.csv")
 	}
 }
 
@@ -31,7 +30,6 @@ workflow w_burdenCarriers {
 	File this_assoc_file
 	File this_group_file
 	String this_out_pref
-	String this_pval
 	Float? this_pval_thresh
 
 	# other inputs
@@ -39,8 +37,8 @@ workflow w_burdenCarriers {
 	Int this_disk
 
 	scatter (this_gds_file in these_gds_files) {
-		call summaryCSVMetal {
-			input: gds_file = this_gds_file, assoc_file = this_assoc_file, group_file = this_group_file, out_pref = this_out_pref, pval = this_pval, pval_thresh = this_pval_thresh, disk = this_disk, memory = this_memory
+		call burdenCarriers {
+			input: gds_file = this_gds_file, assoc_file = this_assoc_file, group_file = this_group_file, out_pref = this_out_pref, pval_thresh = this_pval_thresh, disk = this_disk, memory = this_memory
 		}
 	}	
 }

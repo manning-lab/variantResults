@@ -1,5 +1,5 @@
 ## burdenCarriers.R ##
-# R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${pval} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
+# R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
 
 library(data.table)
 library(SeqArray)
@@ -13,14 +13,13 @@ gds.file <- args[1]
 assoc.file <- args[2]
 group.file <- args[3]
 out.pref <- args[4]
-pval <- args[5]
-pval.thresh <- as.numeric(args[6])
+pval.thresh <- as.numeric(args[5])
 
 # load association results
 assoc.data <- fread(assoc.file, data.table = F, stringsAsFactors = F)
 
 # subset to groups that pass pvalue threshold
-assoc.top <- assoc.data[assoc.data[,pval] < pval.thresh, "MarkerName"]
+assoc.top <- assoc.data[assoc.data[,"pval_0"] < pval.thresh, "MarkerName"]
 
 # load groups (all varaints)
 group.data <- fread(group.file, data.table = F, stringsAsFactors = F)
