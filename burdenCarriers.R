@@ -96,6 +96,9 @@ if (nrow(group.data) > 0) {
     # get sample ids for carriers
     carriers <- row.names(geno)[burden > 0]
     carriers <- data.frame(sample_id = carriers, burden = burden[burden > 0])
+
+    g <- gsub("/","_",g)
+
     fwrite(carriers, file = paste(g,"carriers.csv",sep = "."), sep = ",")
     
     # save the dosage matrix
