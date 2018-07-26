@@ -37,7 +37,7 @@ gds.data <- seqOpen(gds.file)
 chr <- seqGetData(gds.data, "chromosome")[1]
 
 # subset the groups to just this chromosomes groups
-group.data <- group.data[groups.data$chromosome == chr, ]
+group.data <- group.data[group.data$chromosome == chr, ]
 
 # only go on if we have some groups
 if (nrow(group.data) > 0) {
@@ -77,7 +77,7 @@ if (nrow(group.data) > 0) {
     
     # get variant dataframe to merge for variant id
     var.df <- .expandAlleles(gds.data)
-    groups <- merge(cur.group, var.df, by.x = c("chromosome", "position","ref","alt"), by.y = c("chromosome", "position","ref","alt"), all.x = T)
+    cur.group <- merge(cur.group, var.df, by.x = c("chromosome", "position","ref","alt"), by.y = c("chromosome", "position","ref","alt"), all.x = T)
     
     # filter by variant id
     seqSetFilter(gds.data, variant.id = cur.group$variant.id)
