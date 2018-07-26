@@ -9,11 +9,11 @@ task burdenCarriers {
 	Int memory
 	
 	command {
-		R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
+		R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.00001" pval_thresh} < /variantResults/burdenCarriers.R
 	}
 
 	runtime {
-		docker: "manninglab/variantResults:latest"
+		docker: "manninglab/variantresults:0.1"
 		disks: "local-disk ${disk} SSD"
 		memory: "${memory}G"
 	}
