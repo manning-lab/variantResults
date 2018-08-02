@@ -62,10 +62,10 @@ workflow w_burdenCarriers {
 	}
 
 	call combineGds {
-		input: gds_files = burdenCarriers.out_file, disk = this_disk, memory = this_memory
+		input: gds_files = burdenCarriers.out_file, out_pref = this_out_pref, disk = this_disk, memory = this_memory
 	}
 
 	output {
-		File final_gds = combineGds.full_gds, out_pref = this_out_pref
+		File? final_gds = combineGds.full_gds
 	}
 }
