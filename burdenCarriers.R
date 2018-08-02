@@ -1,34 +1,84 @@
 ## burdenCarriers.R ##
-# R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.001" pval_thresh} < /variantResults/burdenCarriers.R
+# R --vanilla --args ${gds_file} ${variant_file} ${out_pref} ${default="NA" sample_file} ${default="topmedid" id_col} < /variantResults/burdenCarriers.R
 
-library(data.table)
-library(SeqArray)
-library(SeqVarTools)
 library(dplyr)
 library(tidyr)
+library(data.table)
+library(SeqVarTools)
 
 # Parse inputs
 args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
-assoc.file <- args[2]
-group.file <- args[3]
-out.pref <- args[4]
-pval.thresh <- as.numeric(args[5])
+var.file <- args[2]
+out.pref <- args[3]
+sample.file <- args[4]
 
-# load association results
-assoc.data <- fread(assoc.file, data.table = F, stringsAsFactors = F)
+##### test inputs #####
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr22.pass_and_fail.gtonly.minDP10.gds"
+# var.file <- "/Users/tmajaria/Documents/projects/topmed/results/rarevar/freeze5b/noncoding/mirna/by_site/mirna.binding.sites.groups.0.01.small.chr22.csv"
+# out.pref <- "mirna.sites.chr22"
+# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes/t2d_Model4_cov_age_sex_topmedproject_ALLT2D_clusterAncestryEU.sample.ids.txt"
+#######################
 
-# subset to groups that pass pvalue threshold
-assoc.top <- assoc.data[assoc.data[,"pval_0"] < pval.thresh, "MarkerName"]
+# id.col <- args[5]
+# pheno.file <- args[4]
 
-# load groups (all varaints)
-group.data <- fread(group.file, data.table = F, stringsAsFactors = F)
+# functions to generate data frame for variants in group
+.variantDF <- function(gds) {
+  data.frame(variant.id=seqGetData(gds, "variant.id"),
+             chromosome=seqGetData(gds, "chromosome"),
+             position=seqGetData(gds, "position"),
+             ref=refChar(gds),
+             alt=altChar(gds),
+             stringsAsFactors=FALSE)
+}
+.expandAlleles <- function(gds) {
+  .variantDF(gds) %>%
+    separate_rows_("alt", sep=",") %>%
+    group_by_("variant.id") %>%
+    as.data.frame()
+}
 
-# make sure we have the right name of the column
-names(group.data)[names(group.data) == "group.id"] <- "group_id"
+# load variants
+var.data <- fread(var.file, data.table = F, stringsAsFactors = F)
 
-# subset to top groups
-group.data <- group.data[group.data$group_id %in% assoc.top,]
+# make sure we have the right column names
+pos.names <- c("group.id","chr","pos","allele","allele.index")
+want.names <- c("group_id","chromosome","position","alt","minor.allele")
+for (i in seq(1,length(pos.names))){
+  if (pos.names[i] %in% names(var.data)){
+    names(var.data)[names(var.data) == pos.names[i]] <- want.names[i]
+  }
+}
+
+# stop if we dont have the bare minimum
+if (!(all(c("group_id","chromosome","position","ref","alt") %in% names(var.data)))){
+  stop("Need to have at least group ids, chromosome, position, ref, and alt in the variant list file")
+}
+
+# check if we have minor allele variable, if not assume alt is minor allele
+if (!("minor.allele" %in% names(var.data))){
+  var.data$minor.allele <- "alt"
+}
+
+# if we have phenotype info, load it
+# if (!(pheno.file == "NA")){
+#   pheno.data <- fread(pheno.file, data.table = F, stringsAsFactors = F)
+# } else {
+#   pheno.data <- NA
+# }
+
+# if we have sample data, load it
+if (!(sample.file == "NA")){
+  sample.data <- fread(sample.file, data.table = F, stringsAsFactors = F, header = F)$V1
+} else {
+  sample.data <- NULL
+}
+
+# if we have both sample and pheno data, subset phenotypes by samples
+# if (!is.na(sample.data) & !is.na(pheno.data))){
+#   pheno.data <- pheno.data[pheno.data[,id.col] %in% sample.data,]
+# }
 
 # open the gds file
 gds.data <- seqOpen(gds.file)
@@ -36,41 +86,47 @@ gds.data <- seqOpen(gds.file)
 # get the current chromosome
 chr <- seqGetData(gds.data, "chromosome")[1]
 
+# make sure chr's are in right format
+chr <- as.character(chr)
+var.data$chromosome <- as.character(var.data$chromosome)
+
+# make sure chrs have same format
+if (startsWith(chr, "chr") & !(startsWith(var.data$chromosome[1], "chr"))){
+  var.data$chromosome <- sub("^","chr",var.data$chromosome)
+} else if (!(startsWith(chr, "chr") & startsWith(var.data$chromosome[1], "chr"))){
+  var.data$chromosome <- sub("chr","",var.data$chromosome)
+}
+
 # subset the groups to just this chromosomes groups
-group.data <- group.data[group.data$chromosome == chr, ]
+var.data <- var.data[var.data$chromosome == chr, ]
+
+# list to store all carriers
+all.carriers <- data.frame(sample_id = seqGetData(gds.data, "sample.id"))
+
+# list to store all variant ids
+all.var.ids <- c()
 
 # only go on if we have some groups
-if (nrow(group.data) > 0) {
+if (nrow(var.data) > 0) {
 
-  for (gind in seq(1,length(assoc.top))){
+  for (gind in seq(1,length(unique(var.data$group_id)))){
+    # subset by sample ids if we have them
+    if (!is.null(sample.data)){
+      seqSetFilter(gds.data, sample.id = sample.data)
+    }
+
     # get the current group
-    g <- assoc.top[gind]
+    g <- unique(var.data$group_id)[gind]
 
     # show me what the current group is
     print(g)
 
     # load groups
-    cur.group <- group.data[group.data$group_id == g,]
+    cur.group <- var.data[var.data$group_id == g,]
     
     # get chromosomes of groups
     min.pos <- min(cur.group$position) - 1
     max.pos <- max(cur.group$position) + 1
-    
-    # functions to generate data frame for variants in group
-    .variantDF <- function(gds) {
-      data.frame(variant.id=seqGetData(gds, "variant.id"),
-                 chromosome=seqGetData(gds, "chromosome"),
-                 position=seqGetData(gds, "position"),
-                 ref=refChar(gds),
-                 alt=altChar(gds),
-                 stringsAsFactors=FALSE)
-    }
-    .expandAlleles <- function(gds) {
-      .variantDF(gds) %>%
-        separate_rows_("alt", sep=",") %>%
-        group_by_("variant.id") %>%
-        as.data.frame()
-    }
     
     # subset to groups
     seqSetFilterChrom(gds.data, chr, from.bp = min.pos, to.bp = max.pos)
@@ -81,33 +137,58 @@ if (nrow(group.data) > 0) {
     
     # filter by variant id
     seqSetFilter(gds.data, variant.id = cur.group$variant.id)
+
+    # store these variant ids for later
+    all.var.ids <- c(all.var.ids, cur.group$variant.id)
     
     # get genotypes
     geno <- data.frame(altDosage(gds.data))
     colnames(geno) <- sub("X","v.", colnames(geno))
     geno[is.na(geno)] <- 0
     
-    # some refs are wrong so we need to change these allele counts
-    mac <- apply(geno,2,sum)
-    geno[mac > 2000,] <- 2 - geno[mac > 2000,]
+    # change the dosages for variants if minor allele is ref rather than alt
+    var.refs <- cur.group[cur.group$minor.allele == "ref","variant.id"]
+    if (length(var.refs) != 0){
+      var.refs <- paste0("v.", var.refs)
+      for (v in var.refs){
+        geno[,v] <- 2 - geno[,v]
+      }
+    }
     
     burden <- apply(geno,1,sum)
     
     # get sample ids for carriers
     carriers <- row.names(geno)[burden > 0]
-    carriers <- data.frame(sample_id = carriers, burden = burden[burden > 0])
 
-    g <- gsub("/","_",g)
+    # make new col in all.carriers
+    all.carriers[,g] <- 0
+    all.carriers[all.carriers$sample_id %in% carriers, g] <- as.numeric(burden[burden > 0])
 
-    fwrite(carriers, file = paste(g,"carriers.csv",sep = "."), sep = ",")
-    
-    # save the dosage matrix
-    fwrite(geno, file = paste(g,"genotypes.csv",sep = "."), sep = ",", row.names = T, col.names = T)
-
-    seqClose(gds.data)
+    # reset filter
+    seqResetFilter(gds.data)
+   
   }
+
+  # get the sample ids with any burden in any group
+  burdens <- apply(all.carriers[,seq(2, ncol(all.carriers))], 1, sum)
+  all.carriers <- all.carriers[burdens > 0,]
+
+  # set filter on gds file
+  seqSetFilter(gds.data, variant.id = all.var.ids, sample.id = as.character(all.carriers$sample_id))
+
+  # define output file name
+  out.file <- paste(out.pref, as.character(chr), "gds", sep = ".")
+
+  # write out the gds file
+  seqExport(gds.data, out.file)
+
+  # close the gds file
+  seqClose(gds.data)
+
+  # clean up
+  cleanup.gds(out.file)
+
 } else {
-  fwrite(list(),file = paste(g,"genotypes.csv",sep = "."))
-  fwrite(list(), file = paste(g,"carriers.csv",sep = "."))
+  stop()
 }
 

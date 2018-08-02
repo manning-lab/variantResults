@@ -1,36 +1,55 @@
 task burdenCarriers {
 	File gds_file
-	File assoc_file
-	File group_file
+	File variant_file
 	String out_pref
-	Float? pval_thresh
+	File? sample_file
 
 	Int disk
 	Int memory
 	
 	command {
-		R --vanilla --args ${gds_file} ${assoc_file} ${group_file} ${out_pref} ${default="0.00001" pval_thresh} < /variantResults/burdenCarriers.R
+		R --vanilla --args ${gds_file} ${variant_file} ${out_pref} ${default="NA" sample_file} < /variantResults/burdenCarriers.R
 	}
 
 	runtime {
 		docker: "manninglab/variantresults:0.1"
 		disks: "local-disk ${disk} SSD"
-		memory: "${memory}G"
+		memory: "${memory} GB"
 	}
 
 	output {
-		Array[File] carriers = glob("${out_pref}.*.carriers.csv")
-		Array[File] genotypes = glob("${out_pref}.*.genotypes.csv")
+		File? out_file = select_first(glob("${out_pref}.*.gds"))
+	}
+}
+
+task combineGds {
+	Array[File?] gds_files
+	String out_pref
+
+	Int disk
+	Int memory
+
+	command {
+		R --vanilla --args ${sep="," gds_files} ${out_pref} < /variantResults/combineGds.R
+	}
+
+	runtime {
+		docker: "manninglab/variantresults:0.1"
+		disks: "local-disk ${disk} SSD"
+		memory: "${memory} GB"
+	}
+
+	output {
+		File? full_gds = select_first(glob("${out_pref}.gds"))
 	}
 }
 
 workflow w_burdenCarriers {
 	# inputs
 	Array[File] these_gds_files
-	File this_assoc_file
-	File this_group_file
+	File this_variant_file
 	String this_out_pref
-	Float? this_pval_thresh
+	File? this_sample_file
 
 	# other inputs
 	Int this_memory
@@ -38,7 +57,15 @@ workflow w_burdenCarriers {
 
 	scatter (this_gds_file in these_gds_files) {
 		call burdenCarriers {
-			input: gds_file = this_gds_file, assoc_file = this_assoc_file, group_file = this_group_file, out_pref = this_out_pref, pval_thresh = this_pval_thresh, disk = this_disk, memory = this_memory
+			input: gds_file = this_gds_file, variant_file = this_variant_file, out_pref = this_out_pref, sample_file = this_sample_file, disk = this_disk, memory = this_memory
 		}
-	}	
+	}
+
+	call combineGds {
+		input: gds_files = burdenCarriers.out_file, disk = this_disk, memory = this_memory
+	}
+
+	output {
+		File final_gds = combineGds.full_gds, out_pref = this_out_pref
+	}
 }
