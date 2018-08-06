@@ -1,4 +1,14 @@
 # subsetting single variant results by a bed file
+
+# Inputs:
+# this_results_file: csv of tsv with aggregate or single variants results, must have column headers including "chr" (or "chromosome") and "pos" (or "position")
+# this_bed_file: csv or tsv in (at least) 3 column BED format with no column headers (columns in order of chromosome, start coordinate, end coordinate)
+# this_out_pref: output file prefix (optional, default = "subset.results")
+# this_memory: amount of memory in GB for running the task
+# this_disk: amount of disk space in GB for running the task
+
+# Outputs:
+# subset_results: csv with only those results intersecting the intervals in this_bed_file, with the same columns as this_results_file (default = "subset.results.csv")
 task subset {
 	File results_file
 	File bed_file
@@ -32,7 +42,7 @@ task subset {
 	>>>
 
 	runtime {
-		docker: "manninglab/variantresults:0.1"
+		docker: "manninglab/variantresults:latest"
 		disks: "local-disk ${disk} SSD"
 		memory: "${memory} GB"
 	}

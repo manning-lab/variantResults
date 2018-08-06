@@ -12,7 +12,7 @@ task burdenCarriers {
 	}
 
 	runtime {
-		docker: "manninglab/variantresults:0.1"
+		docker: "manninglab/variantresults:latest"
 		disks: "local-disk ${disk} SSD"
 		memory: "${memory} GB"
 	}
@@ -34,7 +34,7 @@ task combineGds {
 	}
 
 	runtime {
-		docker: "manninglab/variantresults:0.1"
+		docker: "manninglab/variantresults:latest"
 		disks: "local-disk ${disk} SSD"
 		memory: "${memory} GB"
 	}
