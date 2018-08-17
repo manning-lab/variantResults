@@ -1,0 +1,8 @@
+{
+  "w_burdenCarriers.these_gds_files": ["/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr22.pass_and_fail.gtonly.minDP10.gds","/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.gds"],
+  "w_burdenCarriers.this_variant_file": "/Users/tmajaria/Documents/projects/topmed/results/rarevar/freeze5b/noncoding/mirna/by_site/v1/mirna.binding.sites.groups.0.01.small.chr10.chr22.csv",
+  "w_burdenCarriers.this_disk": 1,
+  "w_burdenCarriers.this_sample_file": "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes/t2d_Model4_cov_age_sex_topmedproject_ALLT2D_clusterAncestryEU.sample.ids.txt",
+  "w_burdenCarriers.this_memory": 1,
+  "w_burdenCarriers.this_out_pref": "mirna.testing"
+}

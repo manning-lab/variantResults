@@ -1,5 +1,5 @@
 task burdenCarriers {
-	Array[File] gds_file
+	Array[File] gds_files
 	File variant_file
 	String out_pref
 	File? sample_file
@@ -8,7 +8,7 @@ task burdenCarriers {
 	Int memory
 	
 	command {
-		R --vanilla --args ${gds_file} ${variant_file} ${out_pref} ${default="NA" sample_file} < /variantResults/burdenCarriers_v2.R
+		R --vanilla --args ${sep="," gds_files} ${variant_file} ${out_pref} ${default="NA" sample_file} < /variantResults/burdenCarriers_v2.R
 	}
 
 	runtime {
@@ -18,7 +18,7 @@ task burdenCarriers {
 	}
 
 	output {
-		File? out_file = "${out_pref}.gds"
+		File out_file = "${out_pref}.gds"
 	}
 }
 
@@ -35,7 +35,7 @@ workflow w_burdenCarriers {
 
 	
 	call burdenCarriers {
-		input: gds_file = these_gds_files, variant_file = this_variant_file, out_pref = this_out_pref, sample_file = this_sample_file, disk = this_disk, memory = this_memory
+		input: gds_files = these_gds_files, variant_file = this_variant_file, out_pref = this_out_pref, sample_file = this_sample_file, disk = this_disk, memory = this_memory
 	}
 
 	output {

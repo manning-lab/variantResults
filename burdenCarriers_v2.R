@@ -14,10 +14,10 @@ library(data.table)
 library(SeqVarTools)
 
 ##### test inputs #####
-gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr22.pass_and_fail.gtonly.minDP10.gds")
-var.file <- "/Users/tmajaria/Documents/projects/topmed/results/rarevar/freeze5b/noncoding/mirna/by_site/v1/mirna.binding.sites.groups.0.01.small.chr22.csv"
-out.pref <- "mirna.sites.chr22"
-sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes/t2d_Model4_cov_age_sex_topmedproject_ALLT2D_clusterAncestryEU.sample.ids.txt"
+# gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr22.pass_and_fail.gtonly.minDP10.gds")
+# var.file <- "/Users/tmajaria/Documents/projects/topmed/results/rarevar/freeze5b/noncoding/mirna/by_site/v1/mirna.binding.sites.groups.0.01.small.chr22.csv"
+# out.pref <- "mirna.sites.chr22"
+# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes/t2d_Model4_cov_age_sex_topmedproject_ALLT2D_clusterAncestryEU.sample.ids.txt"
 #######################
 
 # id.col <- args[5]
