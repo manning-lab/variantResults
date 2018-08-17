@@ -1,0 +1,7 @@
+{
+  "w_burdenCarriers.these_gds_files": ["test_inputs/ALL.chr21.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.MAC10.50k.gds","test_inputs/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.MAC10.01p.gds"],
+  "w_burdenCarriers.this_variant_file": "test_inputs/ALL.chr21.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.groups.csv",
+  "w_burdenCarriers.this_disk": 1,
+  "w_burdenCarriers.this_memory": 1,
+  "w_burdenCarriers.this_out_pref": "1kg.chr21.chr22"
+}
