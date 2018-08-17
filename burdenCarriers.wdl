@@ -1,5 +1,5 @@
 task burdenCarriers {
-	File gds_file
+	Array[File] gds_files
 	File variant_file
 	String out_pref
 	File? sample_file
@@ -8,7 +8,7 @@ task burdenCarriers {
 	Int memory
 	
 	command {
-		R --vanilla --args ${gds_file} ${variant_file} ${out_pref} ${default="NA" sample_file} < /variantResults/burdenCarriers.R
+		R --vanilla --args ${sep="," gds_files} ${variant_file} ${out_pref} ${default="NA" sample_file} < /variantResults/burdenCarriers.R
 	}
 
 	runtime {
@@ -18,31 +18,7 @@ task burdenCarriers {
 	}
 
 	output {
-		File? out_file = select_first(glob("${out_pref}.*.gds"))
-	}
-}
-
-task combineGds {
-	Array[File] gds_files
-	Array[File] sample_ids
-	File variant_file
-	String out_pref
-
-	Int disk
-	Int memory
-
-	command {
-		R --vanilla --args ${sep="," gds_files} ${sep="," sample_ids} ${variant_file} ${out_pref} < /variantResults/combineGds.R
-	}
-
-	runtime {
-		docker: "manninglab/variantresults:latest"
-		disks: "local-disk ${disk} SSD"
-		memory: "${memory} GB"
-	}
-
-	output {
-		File? full_gds = select_first(glob("${out_pref}.gds"))
+		File out_file = "${out_pref}.gds"
 	}
 }
 
@@ -57,17 +33,12 @@ workflow w_burdenCarriers {
 	Int this_memory
 	Int this_disk
 
-	scatter (this_gds_file in these_gds_files) {
-		call burdenCarriers {
-			input: gds_file = this_gds_file, variant_file = this_variant_file, out_pref = this_out_pref, sample_file = this_sample_file, disk = this_disk, memory = this_memory
-		}
-	}
-
-	call combineGds {
-		input: gds_files = burdenCarriers.out_file, out_pref = this_out_pref, disk = this_disk, memory = this_memory
+	
+	call burdenCarriers {
+		input: gds_files = these_gds_files, variant_file = this_variant_file, out_pref = this_out_pref, sample_file = this_sample_file, disk = this_disk, memory = this_memory
 	}
 
 	output {
-		File? final_gds = combineGds.full_gds
+		File burdenCarriers_file = burdenCarriers.out_file
 	}
 }

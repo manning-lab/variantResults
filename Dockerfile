@@ -1,6 +1,6 @@
-FROM r-base:3.5.0
+FROM robbyjo/r-mkl-bioconductor:3.4.3-16.04-2018.1
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git build-essential libcurl4-openssl-dev
 
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
 
