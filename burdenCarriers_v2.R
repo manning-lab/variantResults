@@ -181,7 +181,7 @@ for (g.f in gds.files){
 
   # make sure chr's are in right format
   chr <- as.character(chr)
-  cur.data$chromosome <- all.var.ids[all.var.ids$chromosome == chr,]
+  cur.data <- all.var.ids[all.var.ids$chromosome == chr,]
 
   # set filter on gds file
   seqSetFilter(gds.data, variant.id = cur.data$variant.id, sample.id = all.carriers$sample_id)
