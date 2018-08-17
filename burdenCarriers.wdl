@@ -23,14 +23,16 @@ task burdenCarriers {
 }
 
 task combineGds {
-	Array[File?] gds_files
+	Array[File] gds_files
+	Array[File] sample_ids
+	File variant_file
 	String out_pref
 
 	Int disk
 	Int memory
 
 	command {
-		R --vanilla --args ${sep="," gds_files} ${out_pref} < /variantResults/combineGds.R
+		R --vanilla --args ${sep="," gds_files} ${sep="," sample_ids} ${variant_file} ${out_pref} < /variantResults/combineGds.R
 	}
 
 	runtime {
