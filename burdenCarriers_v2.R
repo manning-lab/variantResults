@@ -164,6 +164,9 @@ for (g.f in gds.files){
 # combine variant data
 all.var.ids <- do.call(rbind,all.var.ids)
 
+# keep only those sample ids that are carriers
+all.carriers <- all.carriers[all.carriers$carrier == 1,]
+
 # store gds file paths
 new.paths <- c()
 
