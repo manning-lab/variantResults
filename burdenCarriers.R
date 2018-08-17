@@ -43,8 +43,8 @@ library(SeqVarTools)
 var.data <- fread(var.file, data.table = F, stringsAsFactors = F)
 
 # make sure we have the right column names
-pos.names <- c("group.id","chr","pos","allele","allele.index")
-want.names <- c("group_id","chromosome","position","alt","minor.allele")
+pos.names <- c("chr","pos","allele","allele.index")
+want.names <- c("chromosome","position","alt","minor.allele")
 for (i in seq(1,length(pos.names))){
   if (pos.names[i] %in% names(var.data)){
     names(var.data)[names(var.data) == pos.names[i]] <- want.names[i]
@@ -52,8 +52,8 @@ for (i in seq(1,length(pos.names))){
 }
 
 # stop if we dont have the bare minimum
-if (!(all(c("group_id","chromosome","position","ref","alt") %in% names(var.data)))){
-  stop("Need to have at least group ids, chromosome, position, ref, and alt in the variant list file")
+if (!(all(c("chromosome","position","ref","alt") %in% names(var.data)))){
+  stop("Need to have at least chromosome, position, ref, and alt in the variant list file")
 }
 
 # check if we have minor allele variable, if not assume alt is minor allele
