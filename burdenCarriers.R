@@ -188,6 +188,10 @@ for (g.f in gds.files){
 
   # set filter on gds file
   seqSetFilter(gds.data, variant.id = cur.data$variant.id, sample.id = all.carriers$sample_id)
+  
+  if (length(seqGetData(gds.data, "variant.id")) == 0){
+    next
+  }
 
   # define output file name
   out.file <- paste(out.pref, as.character(chr), "gds", sep = ".")
@@ -216,3 +220,4 @@ if (length(new.paths) > 1){
 
 # delete old files
 unlink(new.paths, force = T)
+# 
