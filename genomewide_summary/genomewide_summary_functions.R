@@ -40,6 +40,10 @@ do.saige.data <- function(saige.file) {
     system(paste("gsutil cp ",label,"_Plt0.01.csv ",google.bucket.loc,sep=""))
     system(paste("gzip -f ",label,"_allvariants.csv" ,sep=""))
     system(paste("gsutil cp ",label,"_allvariants.csv.gz ",google.bucket.loc,sep=""))
-    print(head(assoc.data))
+
+	fwrite(assoc.data[pvalue<0.01,],file=paste(label,"ZOOM.txt",sep="_"),quote=FALSE,sep="\t")
+	system(paste("htslib-1.9/bgzip -f ",label,"_ZOOM.txt",sep=""))
+	system(paste("htslib-1.9/tabix -f -b 3 -e 3 -s 2 --skip 1 ",label,"_ZOOM.txt.gz",sep=""))
+	system(paste("gsutil cp ",label,"_ZOOM.txt.gz ",label,"_ZOOM.txt.gz.tbi ",google.bucket.loc,sep=""))
 
 }
