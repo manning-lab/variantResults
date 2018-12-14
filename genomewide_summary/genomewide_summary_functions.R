@@ -143,3 +143,9 @@ do.ancestry.manhattan <- function(anc.label,assoc.data.all,maxy=10) {
     #assoc.ps[["mac"]]<=20])
     do.manhattan(data.frame(assoc.data.all[which(assoc.data.all$mac<=20),c("chr","pos","pvalue")]),p="pvalue",ylim=c(2,maxy))
 }
+
+
+do.manhattan <- function(assoc.data,ylim=c(3,32),chr="chr",bp="pos",p="P.value") {
+    manhattan(assoc.data,chr=chr,bp=bp,p=p,
+         suggestiveline = -log10(5e-07), genomewideline = -log10(5e-08) ,ylim=ylim)
+}
