@@ -118,14 +118,14 @@ get.ancestry <- function(anc.label) {
     print(dim(assoc.data))
  
     print(table(p.lt.0.01=assoc.data$pvalue<0.01))
-    print(table(p.lt.0.01=assoc.data$pvalue<0.01,common=assoc.data.all$maf>=0.01))
-    print(table(p.lt.0.01=assoc.data$pvalue<0.01,rare=assoc.data.all$maf<0.01 & assoc.data.all$mac>20))
-    print(table(p.lt.0.01=assoc.data$pvalue<0.01,ultrarare=assoc.data.all$mac<=20))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,common=assoc.data$maf>=0.01))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,rare=assoc.data$maf<0.01 & assoc.data$mac>20))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,ultrarare=assoc.data$mac<=20))
         
     print(paste("Min p-value:",min(assoc.data$pvalue)))
 
   
-	return(assoc.data.all)
+	return(assoc.data)
 }
 
 do.ancestry.manhattan <- function(anc.label,assoc.data.all,maxy=10) {
