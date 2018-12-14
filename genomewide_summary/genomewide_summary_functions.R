@@ -47,3 +47,42 @@ do.saige.data <- function(saige.file) {
 	system(paste("gsutil cp ",label,"_ZOOM.txt.gz ",label,"_ZOOM.txt.gz.tbi ",google.bucket.loc,sep=""))
 
 }
+
+### Create BINS (500 MB windows)
+
+
+do.big.summary<- function(i,assoc.data.index.results){
+    #rbind(
+    tmp1 <- cbind(assoc.data.index.results[[i]][["index.result"]],
+                  assoc.data.index.results[[i]][["assoc.data.index"]][,.(minpos=min(pos),maxpos=max(pos),nvars=length(pos))])
+    tmp3 <- cbind(tmp1,assoc.data.index.results[[i]][["assoc.data.index"]])
+    return(tmp3)
+    #      assoc.data.pooled.index.results[[i]][["assoc.data.index"]])
+}
+get.binned <- function(assoc.data) {
+    assoc.data <- assoc.data[order(chr,pos)]
+    print(head(assoc.data))
+    print(paste("Nrows remaining",nrow(assoc.data)))
+
+    list.results <- list()
+    
+    i<-1
+    
+    while(nrow(assoc.data)>0) {
+        print(paste("Index",i))
+        list.results[[i]] <- list()
+        list.results[[i]][["index.result"]] <- assoc.data[which.min(pvalue),]
+
+        index.chr <- unlist(list.results[[i]][["index.result"]][1,"chr"])
+        print(index.chr)
+        index.pos <- unlist(list.results[[i]][["index.result"]][1,"pos"])
+        print(index.pos)
+        list.results[[i]][["assoc.data.index"]] <- assoc.data[chr == index.chr & (pos > (index.pos - 500000) &  pos < (index.pos+500000))]
+        i <- i+1                                                 
+        assoc.data <- assoc.data[chr != index.chr | (chr == index.chr) & (pos < (index.pos - 500000) |  pos > (index.pos+500000))]
+                                
+        print(head(assoc.data))
+        print(paste("Nrows remaining",nrow(assoc.data)))
+    }
+    return(list.results)
+}
