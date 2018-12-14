@@ -86,3 +86,25 @@ get.binned <- function(assoc.data) {
     }
     return(list.results)
 }
+
+do.it.all <- function(in.file,out.file) {
+    assoc.data <- get.data(in.file)
+    assoc.data <- assoc.data[mac>20]
+    head(assoc.data)
+    summary(assoc.data)
+    assoc.data.index.results <- get.binned(assoc.data)
+
+    assoc.data.index.results.summary <- t(sapply(1:length(assoc.data.index.results),
+                                                            function(i){cbind(assoc.data.index.results[[i]][["index.result"]],
+                                                                              assoc.data.index.results[[i]][["assoc.data.index"]][,.(minpos=min(pos),maxpos=max(pos),nvars=length(pos))])}))
+    assoc.data.index.results.summary
+
+    assoc.data.index.results.summary.all <- rbindlist(sapply(1:length(assoc.data.index.results),
+                                                                do.big.summary,
+                                                                assoc.data.index.results=assoc.data.index.results,
+                                                                simplify = FALSE, USE.NAMES = FALSE))
+
+    fwrite(data.frame(assoc.data.index.results.summary),file=paste(out.file,".binned.csv",sep=""))
+    fwrite(data.frame(assoc.data.index.results.summary.all),file=paste(out.file,".binned.all.csv",sep=""))
+    system(paste("gsutil cp ",out.file,".binned.all.csv ",out.file,".binned.csv ",google.bucket.loc,sep=""))
+}
