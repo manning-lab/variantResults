@@ -149,3 +149,18 @@ do.manhattan <- function(assoc.data,ylim=c(3,32),chr="chr",bp="pos",p="P.value")
     manhattan(assoc.data,chr=chr,bp=bp,p=p,
          suggestiveline = -log10(5e-07), genomewideline = -log10(5e-08) ,ylim=ylim)
 }
+
+
+do.ancestry.manhattan.saige <- function(anc.label,in.file,maxy=10) {
+    assoc.data <- fread(in.file,data.table=T,)
+    
+    options(repr.plot.width=12, repr.plot.height=4)
+
+    print(paste("Common SNPs:",sum(assoc.data$maf>=0.01)))
+    do.manhattan(data.frame(assoc.data[which(assoc.data$maf>=0.01),
+                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy))
+   
+    print(paste("Rare SNPs:",sum(assoc.data$maf<0.01))) 
+    do.manhattan(data.frame(assoc.data[which(assoc.data$maf<0.01),
+                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy))
+}
