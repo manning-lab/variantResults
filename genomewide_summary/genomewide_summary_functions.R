@@ -108,3 +108,38 @@ do.it.all <- function(in.file,out.file) {
     fwrite(data.frame(assoc.data.index.results.summary.all),file=paste(out.file,".binned.all.csv",sep=""))
     system(paste("gsutil cp ",out.file,".binned.all.csv ",out.file,".binned.csv ",google.bucket.loc,sep=""))
 }
+
+
+### Manhattan Plots
+
+get.ancestry <- function(anc.label) {
+
+    assoc.data <- fread(get.data(assoc.names[[anc.label]]),data.table=T,showProgress=T)
+    print(dim(assoc.data))
+ 
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,common=assoc.data.all$maf>=0.01))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,rare=assoc.data.all$maf<0.01 & assoc.data.all$mac>20))
+    print(table(p.lt.0.01=assoc.data$pvalue<0.01,ultrarare=assoc.data.all$mac<=20))
+        
+    print(paste("Min p-value:",min(assoc.data$pvalue)))
+
+  
+	return(assoc.data.all)
+}
+
+do.ancestry.manhattan <- function(anc.label,assoc.data.all,maxy=10) {
+  	options(repr.plot.width=12, repr.plot.height=4)
+
+    print(paste("Common SNPs:",sum(assoc.data.all$maf>=0.01)))
+    #assoc.ps[["maf"]] >= 0.01]))
+    do.manhattan(data.frame(assoc.data.all[which(assoc.data.all$maf>=0.01),c("chr","pos","pvalue")]),p="pvalue",ylim=c(2,maxy))
+   
+    print(paste("Rare SNPs:",sum(assoc.data.all$maf<0.01 & assoc.data.all$mac>20))) 
+    #assoc.ps[["maf"]] < 0.01 & assoc.ps[["mac"]]>20])
+    do.manhattan(data.frame(assoc.data.all[which(assoc.data.all$maf<0.01 & assoc.data.all$mac>20),c("chr","pos","pvalue")]),p="pvalue",ylim=c(2,maxy))
+
+    print(paste("Ultrarare SNPs:",sum(assoc.data.all$mac<=20)))
+    #assoc.ps[["mac"]]<=20])
+    do.manhattan(data.frame(assoc.data.all[which(assoc.data.all$mac<=20),c("chr","pos","pvalue")]),p="pvalue",ylim=c(2,maxy))
+}
