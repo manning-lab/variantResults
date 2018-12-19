@@ -7,7 +7,7 @@ task subsetGds {
 	Int memory
 	
 	command {
-		R --vanilla --args ${sep="," gds_files} ${variant_file} < /variantResults/subsetGds.R
+		R --vanilla --args ${sep="," gds_files} ${variant_file} ${out_pref} < /variantResults/subsetGds.R
 	}
 
 	runtime {

@@ -13,4 +13,5 @@ RUN echo "install.packages(c('data.table','dplyr','tidyr'), repos='http://cran.u
 RUN cd / && \
 	git clone https://github.com/manning-lab/variantResults.git && \
 	cd variantResults && \
-	git pull origin master
+	git pull origin master && \
+	echo thisHIHi
