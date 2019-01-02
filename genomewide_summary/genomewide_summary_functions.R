@@ -2,7 +2,7 @@
 
 get.data <- function(fname) {
    if(!file.exists(fname)) {
-	     print(paste("Copying",saige.file,"from google bucket"))
+	     print(paste("Copying",fname,"from google bucket"))
 	system(paste("gsutil cp ",google.bucket.loc,fname," ",fname,sep=""))
    }
    if(grepl(".gz$",fname)) {
