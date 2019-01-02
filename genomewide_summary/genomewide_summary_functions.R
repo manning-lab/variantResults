@@ -166,8 +166,8 @@ do.manhattan <- function(assoc.data,ylim=c(3,32),chr="chr",bp="pos",p="P.value")
 }
 
 
-do.ancestry.manhattan.saige <- function(anc.label,in.file,maxy=10) {
-    assoc.data <- fread(in.file,data.table=T,)
+do.manhattan.saige <- function(in.file,maxy=10) {
+    assoc.data <- get.data(in.file)
     
     options(repr.plot.width=12, repr.plot.height=4)
 
