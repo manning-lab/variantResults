@@ -1,19 +1,22 @@
 # Functions to create paper-ready tables & figures of genome-wide sequence association studies
 
 get.data <- function(fname) {
-     if(grepl(".gz$",fname)) {
+   if(!file.exists(fname)) {
+	     print(paste("Copying",saige.file,"from google bucket"))
+	system(paste("gsutil cp ",google.bucket.loc,fname," ",fname,sep=""))
+   }
+   if(grepl(".gz$",fname)) {
             print("Reading in GZipped file")
-            assoc.data <- fread(paste("gunzip -c ",fname,sep=""),data.table=T,key="chr,pos,ref,alt")
-    } else {
+            assoc.data <- fread(cmd=paste("gunzip -c ",fname,sep=""),data.table=T,key="chr,pos,ref,alt")
+   } else {
             print("Reading in file")
             assoc.data <- fread(fname,data.table=T,key="chr,pos,ref,alt")
-    }
+   }
 }
 
 # variables that need to be defined:
 #  google.bucket.loc <- "gs:/.../"
-
-lapply(c("qqman","data.table","tools","RColorBrewer"), library, character.only = TRUE)
+#lapply(c("qqman","data.table","tools","RColorBrewer"), library, character.only = TRUE)
 
 do.saige.data <- function(saige.file) {
     print(saige.file)
