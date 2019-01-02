@@ -188,6 +188,30 @@ lam.new <- function(x,p=.5){
   round((qchisq(1-x.quantile,1)/qchisq(p,1)),2)
 }
 
+
+qqpval3 <- function(x, main="", col="black"){
+  par(mgp=c(2,1,0))
+
+  print(min(x))
+  x<-sort(-log10(x))
+  n<-length(x)
+  print(n)
+  print(length(seq(round(n*.999),n)))
+  
+  for.xaxis <- qexp(ppoints(n))/log(10)
+  
+  print(tail(for.xaxis[seq(round(n*.9),n)]))
+  print(tail(x[seq(round(n*.9),n)]))
+  
+  plot(x=for.xaxis[seq(round(n*.9),n)], y=x[seq(round(n*.9),n)], 
+       xlab="Expected", ylab="Observed", main=main ,col=col ,cex=.8, bg= col, 
+       pch = 19,
+       xlim=c(1,max(for.xaxis)),
+       ylim=c(1,max(x)),bty="n")
+  abline(0,1, lty=2)
+}
+
+
 qqplot.saige <- function(in.file) {
     assoc.data <- get.data(in.file)
     head(assoc.data)
