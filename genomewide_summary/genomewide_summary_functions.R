@@ -103,6 +103,8 @@ get.binned <- function(assoc.data) {
 do.it.all <- function(in.file,out.file) {
     assoc.data <- get.data(in.file)
     assoc.data <- assoc.data[mac>20]
+    assoc.data$OR =  exp(assoc.data$BETA)
+
     head(assoc.data)
     summary(assoc.data)
     assoc.data.index.results <- get.binned(assoc.data)
