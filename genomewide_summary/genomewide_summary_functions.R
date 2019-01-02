@@ -1,5 +1,15 @@
 # Functions to create paper-ready tables & figures of genome-wide sequence association studies
 
+get.data <- function(fname) {
+     if(grepl(".gz$",fname)) {
+            print("Reading in GZipped file")
+            assoc.data <- fread(paste("gunzip -c ",fname,sep=""),data.table=T,key="chr,pos,ref,alt")
+    } else {
+            print("Reading in file")
+            assoc.data <- fread(fname,data.table=T,key="chr,pos,ref,alt")
+    }
+}
+
 # variables that need to be defined:
 #  google.bucket.loc <- "gs:/.../"
 
