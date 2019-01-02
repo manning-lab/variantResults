@@ -179,3 +179,41 @@ do.manhattan.saige <- function(in.file,maxy=10) {
     do.manhattan(data.frame(assoc.data[which(assoc.data$maf<0.01),
                                               c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy))
 }
+
+## QQ plots
+lam.new <- function(x,p=.5){
+  x = x[!is.na(x)]
+  #chisq <- qchisq(1-x,1)
+  x.quantile <- quantile(x,p)
+  round((qchisq(1-x.quantile,1)/qchisq(p,1)),2)
+}
+
+qqplot.saige <- function(in.file) {
+    assoc.data <- get.data(in.file)
+    head(assoc.data)
+    assoc.ps <- list()
+
+    assoc.ps[["ps"]] <- unlist(assoc.data$pvalue)
+    assoc.ps[["maf"]] <- unlist(assoc.data$maf)
+    rm(assoc.data)
+
+    options(repr.plot.width=4, repr.plot.height=4)
+
+    print(paste("Common SNPs:",sum(assoc.ps[["maf"]] >= 0.01)))
+    print(summary(assoc.ps[["ps"]][assoc.ps[["maf"]] >= 0.01]))
+    print(table(assoc.ps[["maf"]] >= 0.01))
+    lam.meta.common <- lam.new(assoc.ps[["ps"]][assoc.ps[["maf"]] >= 0.01])
+    print(lam.meta.common)
+    qqpval3(assoc.ps[["ps"]][assoc.ps[["maf"]] >= 0.01],
+        main=paste0('GC (MAF >= 1%)=',lam.meta.common))
+
+    print(paste("Rare SNPs:",sum(assoc.ps[["maf"]] < 0.01 ) )) 
+    summary(assoc.ps[["ps"]][assoc.ps[["maf"]] < 0.01 ])
+    print(table(assoc.ps[["maf"]] < 0.01 ))
+    lam.meta.rare <- lam.new(assoc.ps[["ps"]][assoc.ps[["maf"]] < 0.01 ])
+    print(lam.meta.rare)
+    qqpval3(assoc.ps[["ps"]][assoc.ps[["maf"]] < 0.01 ],
+        main=paste0('GC (MAF < 1%)=',lam.meta.rare))
+    rm(assoc.ps)
+    gc()
+}
