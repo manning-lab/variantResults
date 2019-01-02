@@ -74,7 +74,7 @@ do.big.summary<- function(i,assoc.data.index.results){
 }
 get.binned <- function(assoc.data) {
     assoc.data <- assoc.data[order(chr,pos)]
-    print(head(assoc.data))
+    #print(head(assoc.data))
     print(paste("Nrows remaining",nrow(assoc.data)))
 
     list.results <- list()
@@ -82,19 +82,19 @@ get.binned <- function(assoc.data) {
     i<-1
     
     while(nrow(assoc.data)>0) {
-        print(paste("Index",i))
+        #print(paste("Index",i))
         list.results[[i]] <- list()
         list.results[[i]][["index.result"]] <- assoc.data[which.min(pvalue),]
 
         index.chr <- unlist(list.results[[i]][["index.result"]][1,"chr"])
-        print(index.chr)
+        #print(index.chr)
         index.pos <- unlist(list.results[[i]][["index.result"]][1,"pos"])
-        print(index.pos)
+        #print(index.pos)
         list.results[[i]][["assoc.data.index"]] <- assoc.data[chr == index.chr & (pos > (index.pos - 500000) &  pos < (index.pos+500000))]
         i <- i+1                                                 
         assoc.data <- assoc.data[chr != index.chr | (chr == index.chr) & (pos < (index.pos - 500000) |  pos > (index.pos+500000))]
                                 
-        print(head(assoc.data))
+        #print(head(assoc.data))
         print(paste("Nrows remaining",nrow(assoc.data)))
     }
     return(list.results)
@@ -112,7 +112,7 @@ do.it.all <- function(in.file,out.file) {
     assoc.data.index.results.summary <- t(sapply(1:length(assoc.data.index.results),
                                                             function(i){cbind(assoc.data.index.results[[i]][["index.result"]],
                                                                               assoc.data.index.results[[i]][["assoc.data.index"]][,.(minpos=min(pos),maxpos=max(pos),nvars=length(pos))])}))
-    assoc.data.index.results.summary
+    print(assoc.data.index.results.summary)
 
     assoc.data.index.results.summary.all <- rbindlist(sapply(1:length(assoc.data.index.results),
                                                                 do.big.summary,
