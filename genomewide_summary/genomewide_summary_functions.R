@@ -75,7 +75,7 @@ do.big.summary<- function(i,assoc.data.index.results){
 get.binned <- function(assoc.data) {
     assoc.data <- assoc.data[order(chr,pos)]
     #print(head(assoc.data))
-    print(paste("Nrows remaining",nrow(assoc.data)))
+    #print(paste("Nrows remaining",nrow(assoc.data)))
 
     list.results <- list()
     
@@ -95,7 +95,7 @@ get.binned <- function(assoc.data) {
         assoc.data <- assoc.data[chr != index.chr | (chr == index.chr) & (pos < (index.pos - 500000) |  pos > (index.pos+500000))]
                                 
         #print(head(assoc.data))
-        print(paste("Nrows remaining",nrow(assoc.data)))
+        #print(paste("Nrows remaining",nrow(assoc.data)))
     }
     return(list.results)
 }
@@ -105,14 +105,12 @@ do.it.all <- function(in.file,out.file) {
     assoc.data <- assoc.data[mac>20]
     assoc.data$OR =  exp(assoc.data$BETA)
 
-    head(assoc.data)
-    summary(assoc.data)
     assoc.data.index.results <- get.binned(assoc.data)
 
     assoc.data.index.results.summary <- t(sapply(1:length(assoc.data.index.results),
                                                             function(i){cbind(assoc.data.index.results[[i]][["index.result"]],
                                                                               assoc.data.index.results[[i]][["assoc.data.index"]][,.(minpos=min(pos),maxpos=max(pos),nvars=length(pos))])}))
-    print(assoc.data.index.results.summary)
+    
 
     assoc.data.index.results.summary.all <- rbindlist(sapply(1:length(assoc.data.index.results),
                                                                 do.big.summary,
@@ -122,6 +120,8 @@ do.it.all <- function(in.file,out.file) {
     fwrite(data.frame(assoc.data.index.results.summary),file=paste(out.file,".binned.csv",sep=""))
     fwrite(data.frame(assoc.data.index.results.summary.all),file=paste(out.file,".binned.all.csv",sep=""))
     system(paste("gsutil cp ",out.file,".binned.all.csv ",out.file,".binned.csv ",google.bucket.loc,sep=""))
+	
+    assoc.data.index.results.summary
 }
 
 
