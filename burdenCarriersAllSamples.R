@@ -177,7 +177,7 @@ for (g.f in gds.files){
   gds.data <- seqOpen(g.f)
 
   # set filter to carriers
-  seqSetFilter(gds.data, sample.id = all.carriers$sample_id)
+  # seqSetFilter(gds.data, sample.id = all.carriers$sample_id)
 
   # get the current chromosome
   chr <- seqGetData(gds.data, "chromosome")[1]
