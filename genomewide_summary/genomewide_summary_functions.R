@@ -173,11 +173,11 @@ do.manhattan.saige <- function(in.file,maxy=10,genomewideline=-log10(5e-08)) {
 
     print(paste("Common SNPs:",sum(assoc.data$maf>=0.01)))
     do.manhattan(data.frame(assoc.data[which(assoc.data$maf>=0.01),
-                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy),genomewideline=genomewideline,suggestiveline=NA)
+                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy),genomewideline=genomewideline,suggestiveline=FALSE)
    
     print(paste("Rare SNPs:",sum(assoc.data$maf<0.01))) 
     do.manhattan(data.frame(assoc.data[which(assoc.data$maf<0.01),
-                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy),genomewideline=genomewideline,suggestiveline=NA)
+                                              c("chr","pos","pvalue")]),chr="chr",p="pvalue",ylim=c(2,maxy),genomewideline=genomewideline,suggestiveline=FALSE)
 }
 
 ## QQ plots
